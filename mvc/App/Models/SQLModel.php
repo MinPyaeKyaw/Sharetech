@@ -53,7 +53,7 @@ class SQLModel implements QueryBuilderInterface {
 
         $this->reset();
         if (!is_array($value)) {
-            $this->query->base = "INSERT INTO " . $this->table . "(" . $fields . ")" ." VALUES (".$value;
+            $this->query->base = "INSERT INTO " . $this->table . "(" . $fields . ")" ." VALUES ('".Security::escapeInput($value)."'";
         }else {
             $this->query->base = "INSERT INTO " . $this->table . "(" . $fields . ")" ." VALUES (";
             for($i=0; $i<count($value); $i++) {
