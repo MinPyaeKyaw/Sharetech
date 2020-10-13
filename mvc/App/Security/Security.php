@@ -211,12 +211,14 @@ class Security {
 	CSRF Form input
 	*/
 	static public function csrf() {
-		$token = self::hash(self::token());
-		$_SESSION['csrf'] = $token;
+		if (!isset($_COOKIE['csrf'])) {
+			$token = self::hash(self::token());
+			setcookie('csrf', $token);	
+		}else {
+			$token = $_COOKIE['csrf'];
+		}
 
-		$form  = "<input type='hidden' name='csrf' value='{$token}'>";
-
-		echo $form;
+		echo "<input type='hidden' name='csrf' value='{$token}'>";
 	}
 	
 
