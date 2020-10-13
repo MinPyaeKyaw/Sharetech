@@ -19,6 +19,9 @@ class FacadeApp {
 			}
 			pathinfo($auth[$i], PATHINFO_FILENAME)::authCheck();
 		}
+		
+		// Regenerating Session Id
+		Security::reSession();
 
 	}
 
