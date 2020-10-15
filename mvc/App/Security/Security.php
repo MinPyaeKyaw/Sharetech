@@ -136,22 +136,10 @@ class Security {
 		$input = addslashes($input);
 		$input = str_replace('--', '', $input);
 		$input = rtrim($input, '--');
+		$input = str_replace('#', '', $input);
+		$input = rtrim($input, '#');
 		$input = str_replace('/*', '', $input);
 		$input = rtrim($input, '/*');
-		$input = htmlspecialchars($input);
-		$input = trim($input);
-
-		return $input;
-	}
-	// End of escape injections
-
-
-
-	/*-
-	----
-	Preventing XSS Attack
-	*/
-	static public function escapeXss($input) {
 		$input = strip_tags($input);
 		$input = preg_replace("/<script\b[^>]*>(.*?)<\/script>/", "", $input);
 		$input = preg_replace("/<img[^>]+\>/", "", $input);
@@ -160,6 +148,7 @@ class Security {
 
 		return $input;
 	}
+	// End of escape injections
 
 
 	/*-

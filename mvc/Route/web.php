@@ -23,4 +23,20 @@ Route::go("deleteCat","CategoryController@deleteCategory");
 Route::go("updateCatPage","CategoryController@updateCategoryPage");
 Route::go("updateCat","CategoryController@updateCategory");
 
+/*-
+----
+CRUD for Course
+*/
+Route::go("instructor/insertCoursePage", "CourseController@insertPage");
+Route::go("instructor/insertCourse", "CourseController@insertCourse");
+
+Route::go("instructor/viewAllCourse", "CourseController@viewAll");
+Route::go("instructor/viewByInst", "CourseController@viewByInst");
+Route::go("instructor/viewByCat/$id", "CourseController@viewByCat");
+
+Route::go("instructor/updatePage", "CourseController@updateCoursePage");
+Route::go("instructor/updateCourse", "CourseController@updateCourse");
+
+Route::go("instructor/deleteCourse", "CourseController@deleteCourse");
+
  ?>

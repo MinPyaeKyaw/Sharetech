@@ -116,19 +116,24 @@ class SQLModel implements QueryBuilderInterface {
     public function update($field, $value) {
         
         $this->reset();
-        $this->query->base = "UPDATE ".$this->table." SET ";
-        $this->query->type = 'update';
-        $field = explode(',', $field);
-        $value = explode(',', $value);
-        
-        for ($i=0; $i<=count($field)-1 ; $i++) { 
+        if (!is_array($value)) {
+            $this->query->base = "UPDATE ".$this->table." SET ";
+            $this->query->type = 'update';
+            $this->query->base .= $field.'='."'".Security::escapeInput($value)."'";
+        }else {
+            $this->query->base = "UPDATE ".$this->table." SET ";
+            $this->query->type = 'update';
+            $field = explode(',', $field);
+            
+            for ($i=0; $i<=count($field)-1 ; $i++) { 
 
-            if ($i < count($field)-1) {
-                $this->query->base .= $field[$i].'='."'".Security::escapeInput($value[$i])."', ";
-            }else {
-                $this->query->base .= $field[$i].'='."'".Security::escapeInput($value[$i])."'";
+                if ($i < count($field)-1) {
+                    $this->query->base .= $field[$i].'='."'".Security::escapeInput($value[$i])."', ";
+                }else {
+                    $this->query->base .= $field[$i].'='."'".Security::escapeInput($value[$i])."'";
+                }
+
             }
-
         }
 
         return $this;

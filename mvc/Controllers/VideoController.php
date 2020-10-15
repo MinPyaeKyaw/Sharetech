@@ -1,9 +1,8 @@
 <?php 
 
 // beginning of the Category Controller class
-class CategoryController extends Controller {
+class VideoController extends Controller {
 
-	// to insert page
 	public function insertPage() {
 		$this->view->render("Category/insertCategory");
 	}
