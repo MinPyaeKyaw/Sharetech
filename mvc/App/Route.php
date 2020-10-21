@@ -54,6 +54,28 @@ class Route {
 		}
 		
 	}
+	
+	/*-
+	----
+	route function for echo string to route the pages form everywhere
+	*/
+	public static function routeStr($url) {
+		$path      = $_GET['url'];
+		$pathArray = explode('/', rtrim($path, '/'));
+		$toBack    = '../';
+		$routing   = '';
+
+		if (empty($path)) {
+			header("location: home");
+		}else {
+			for ($i=0; $i<count($pathArray)-1; $i++) { 
+				$routing .= $toBack;
+			}
+
+			return $routing .= $url;
+		}
+		
+	}
 
 } 
 
