@@ -13,11 +13,6 @@ class Security {
 	*/
 	static private $blackListExtensions = array('PHP','HTACCESS','HTML','CSS','JS','XML','JSON','CSV','PDF','BIN','EXE','TXT','SH','PL','PY','CGI','ZIP','RAR','GIF');
 
-	/*-
-	----
-	Extension Whitelist
-	*/
-	static private $whiteListExtensions = array('JPG', 'PNG', 'JPEG');
 
 	/*-
 	----
@@ -69,10 +64,7 @@ class Security {
 		$basename  = self::getBasename($filename);
 
 
-		if (strlen($filename) > 20) {
-			$flag = false;
-		}
-		elseif ($extension != 'JPG' && $extension != 'JPEG' && $extension != 'PNG') {
+		if ($extension != 'JPG' && $extension != 'JPEG' && $extension != 'PNG' && $extension != 'MP4') {
 			$flag = false;
 		}
 		elseif (empty($extension)) {

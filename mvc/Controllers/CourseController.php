@@ -21,14 +21,48 @@ class CourseController extends Controller {
 				$course_name        = $_POST['course_name'];
 				$course_description = $_POST['course_description'];
 				$course_cover       = $_FILES['course_cover']['name'];
+				$tmp_course_cover   = $_FILES['course_cover']['tmp_name'];
 				
-				// query for inserting course
-				$sql = $courseModel->insert('course_name, course_description, course_cover, instructor_id, category_id', [$course_name, $course_description, $course_cover, $inst_id, $cat_id])->getQuery();
-				$courseModel->run($sql);
+				// defining tmp folder path
+				$tmpFolder = "Views/tmp_course/";
+				// getting id to avoid duplication in tmp folder
+				$id = count(scandir($tmpFolder));
 
-				// redirecting to insert page
-				$this->redirect('instructor/insertCoursePage');
+				// creating course folder in tmp folder
+				mkdir($tmpFolder.$id.'_'.$course_name);
+				mkdir($tmpFolder.$id.'_'.$course_name."/cover");
 
+				if (Security::escapeFile($course_cover) == true) {
+
+					// storing in tmp folder
+					move_uploaded_file(
+						$tmp_course_cover, 
+						$tmpFolder.$id.'_'.$course_name."/cover/".$course_cover
+					);
+
+					// query for inserting course
+					$sql = $courseModel
+					->insert(
+						'course_name,course_description,course_cover, instructor_id,category_id', 
+						[$course_name,$course_description,$course_cover,$inst_id, $cat_id]
+					)
+					->getQuery();
+					$courseModel->run($sql);
+
+					// query for getting course id for vedio upload
+					$sql = $courseModel->select('course_id')->where('instructor_id', $inst_id)->where('course_name', $course_name)->getQuery();
+
+					// getting courseId
+					$courseId = '';
+					foreach ($courseModel->fetch($sql) as $value) {
+						$courseId = $value['course_id'];
+					}
+
+					// exporting data to view
+					$this->view->course_id = $courseId;
+					$this->view->course = $id.'_'.$course_name;
+					$this->view->render('Instructor/insertVideoPage');
+				}
 			}
 		}
 	}
@@ -114,7 +148,13 @@ class CourseController extends Controller {
 				$course_cover = $_FILES['course_cover']['name'];
 
 				// query for updating course
-				$sql = $courseModel->update('course_name, course_description, course_cover, updated_at', [$course_name, $course_description, $course_cover, 'now()'])->where('course_id', $course_id)->getQuery();
+				$sql = $courseModel
+				->update(
+					'course_name,course_description,course_cover,updated_at', 
+					[$course_name,$course_description,$course_cover, 'now()']
+				)
+				->where('course_id', $course_id)
+				->getQuery();
 				$courseModel->run($sql);
 
 				// need to delete videos in video table

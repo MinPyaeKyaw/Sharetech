@@ -39,4 +39,13 @@ Route::go("instructor/updateCourse", "CourseController@updateCourse");
 
 Route::go("instructor/deleteCourse", "CourseController@deleteCourse");
 
+/*-
+----
+CRUD for Video
+*/
+Route::go("instructor/editUploadedVideo", "VideoController@insertIndivitualPage");
+Route::go("instructor/finalUpload", "VideoController@insertIndivitualVideo");
+
+
+
  ?>
