@@ -21,6 +21,7 @@ class VideoController extends Controller {
 
 						// generating input for each video
 						$name = str_replace(' ', '_', basename($videos[$i], '.php'));
+						$input .= $videos[$i]."<br>";
 						$input .= "<label>Video Title</label>";
 						$input .= "<br>";
 						$input .= "<input type=\"text\" name=".$name." />";
