@@ -98,7 +98,7 @@ class CategoryController extends Controller {
 				$cat   = $_POST['cat'];
 
 				// query for updating category
-				echo $sql = $categoryModel->update('category', $cat)->where('category_id', $catId)->getQuery();
+				$sql = $categoryModel->update('category', $cat)->where('category_id', $catId)->getQuery();
 				$categoryModel->run($sql);
 
 				// redirecting to category view
@@ -106,9 +106,7 @@ class CategoryController extends Controller {
 
 			}
 		}
-
 	}
-
 }
 
  ?>
