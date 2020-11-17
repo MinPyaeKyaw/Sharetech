@@ -8,10 +8,11 @@ class Controller {
 
 	/*-
 	----
-	Instancing View Object and Get the Implements
+	Instancing View Object and Api Object Get the Implements
 	*/
 	public function __construct() {
 		$this->view = new View();
+		$this->api = new Api();
 	}
 
 	/*-

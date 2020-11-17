@@ -10,15 +10,24 @@
 	}
 
 	echo "<br>";
+	echo "<br>";
 
 	foreach ($this->courses as $value) {
-		echo $value['course_name'];
-		echo "<br>";
-		echo $value['course_description'];
-		echo "<br>";
-		echo $value['course_cover'];
-		echo "<br>";
 ?>
+	<div>
+		<h1>
+			<!-- generating course path -->
+			<?php $route = "course/".$value['course_id']; ?>
+			<a href="<?php Route::route($route) ?>">
+				<?php $course = explode("_", $value['course_name']); ?>
+				<?php echo $course[1]; ?>
+			</a>
+		</h1>
+		<p>
+			<?php echo $value['course_description']; ?>
+		</p>
+	</div>
+
 	<!-- Update Form -->
 	<form action="<?php Route::route('instructor/updatePage') ?>" method="post">
 

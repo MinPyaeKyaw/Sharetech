@@ -24,6 +24,7 @@ spl_autoload_register(function($class) {
 	Getting Paths
 	*/
 	$paths = array(
+		'api/',
 		'App/',
 		'App/Models/',
 		'App/Security/',
@@ -47,12 +48,6 @@ spl_autoload_register(function($class) {
 
 
 });
-
-/*-
-----
-Defining Authentication path
-*/
-AdminAuthentication::authCheck();
 
 new FacadeApp();
 

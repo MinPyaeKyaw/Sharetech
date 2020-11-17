@@ -40,9 +40,12 @@ class CategoryController extends Controller {
 		$sql = $categoryModel->select('*')->getQuery();
 
 		// exporting fetched data to view
-		$this->view->cats = $categoryModel->fetch($sql);
-		$this->view->render('Category/viewCategory');
+		// $this->view->cats = $categoryModel->fetch($sql);
+		// $this->view->render('Category/viewCategory');
 
+		// exporting fetched data to api
+		$this->api->cats = $categoryModel->fetch($sql);
+		$this->api->request('v1/cat');
 	}
 
 	// deleting category

@@ -2,7 +2,7 @@
 <?php 
 
 	// getting course information that we want ot update
-	foreach ($this->courseInfo as $value) {
+	foreach ($_SESSION['courseInfo'] as $value) {
 		$course_id          = $value['course_id'];
 		$course_name        = $value['course_name'];
 		$course_description = $value['course_description'];
@@ -10,6 +10,8 @@
 	}
 
  ?>
+
+<!-- Course updating form -->
 <form action="<?php Route::route('instructor/updateCourse') ?>" method="post" enctype="multipart/form-data">
 
 	<?php Security::csrf(); ?>
@@ -29,4 +31,13 @@
 
 	<input type="submit" name="updateCourse" value="Update">
 
+</form>
+
+<!-- to videos updating form -->
+<form method="post" action="<?php Route::route('instructor/videoUpdate') ?>">
+	<?php Security::csrf(); ?>
+
+	<input type="hidden" name="course_id" value="<?php echo $course_id ?>" />
+
+	<input type="submit" name="toUpdateVideo" value="Update Videos">
 </form>

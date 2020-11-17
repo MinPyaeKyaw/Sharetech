@@ -3,9 +3,9 @@
 
 	<?php Security::csrf(); ?>
 
-	<input type="hidden" name="course_id" value="<?php echo $this->course_id ?>">
+	<input type="hidden" name="course_id" value="<?php echo $this->course_id; ?>">
 
-	<input type="hidden" name="course_name" value="<?php echo $this->course ?>">
+	<input type="hidden" name="course_name" value="<?php echo $this->course; ?>">
 
 	<label>Upload your videos</label><br>
 	<input type="file" name="video[]" multiple="multiple"><br><br>

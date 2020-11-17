@@ -5,7 +5,7 @@ class CourseController extends Controller {
 
 	// to insert page
 	public function insertPage() {
-		$this->view->render("Instructor/uploadCourse/insertCoursePage");
+		$this->view->render("Instructor/insertCoursePage");
 	}
 
 	// insert course
@@ -26,7 +26,7 @@ class CourseController extends Controller {
 				// defining tmp folder path
 				$tmpFolder = "Views/tmp_course/";
 				// getting id to avoid duplication in tmp folder
-				$id = count(scandir($tmpFolder));
+				$id = rand();
 
 				// creating course folder in tmp folder
 				mkdir($tmpFolder.$id.'_'.$course_name);
@@ -44,13 +44,13 @@ class CourseController extends Controller {
 					$sql = $courseModel
 					->insert(
 						'course_name,course_description,course_cover, instructor_id,category_id', 
-						[$course_name,$course_description,$course_cover,$inst_id, $cat_id]
+						[$id.'_'.$course_name,$course_description,$course_cover,$inst_id, $cat_id]
 					)
 					->getQuery();
 					$courseModel->run($sql);
 
 					// query for getting course id for vedio upload
-					$sql = $courseModel->select('course_id')->where('instructor_id', $inst_id)->where('course_name', $course_name)->getQuery();
+					$sql = $courseModel->select('course_id')->where('instructor_id', $inst_id)->where('course_name', $id.'_'.$course_name)->getQuery();
 
 					// getting courseId
 					$courseId = '';
@@ -73,6 +73,16 @@ class CourseController extends Controller {
 		$courseModel = new CourseModel();
 		// instance category model
 		$categoryModel = new CategoryModel();
+
+		if (isset($_SESSION['videos'])) {
+			unset($_SESSION['videos']);
+		}
+		if (isset($_SESSION['course_id'])) {
+			unset($_SESSION['course_id']);
+		}
+		if (isset($_SESSION['deleted'])) {
+			unset($_SESSION['deleted']);
+		}
 
 		// query for fetching category
 		$sqlCat = $categoryModel->select("*")->getQuery();
@@ -126,7 +136,7 @@ class CourseController extends Controller {
 				$sql = $courseModel->select('*')->where('course_id', $courseId)->getQuery();
 
 				// exporting to view
-				$this->view->courseInfo = $courseModel->fetch($sql);
+				$_SESSION['courseInfo'] = $courseModel->fetch($sql);
 				$this->view->render("Instructor/updateCourse");
 			
 			}
@@ -170,11 +180,17 @@ class CourseController extends Controller {
 	public function deleteCourse() {
 		// instance course model
 		$courseModel = new CourseModel();
+		// instance video model
+		$videoModel = new VideoModel();
 
 		if(isset($_POST['deleteSubmit'])) {
 			if(Security::verifyCSRF($_POST['csrf']) == true) {
 
 				$course_id = $_POST['course_id'];
+
+				// query for deleting videos of the course
+				$sql = $videoModel->delete()->where('course_id', $course_id)->getQuery();
+				$videoModel->run($sql);
 
 				// query for deleting course
 				$sql = $courseModel->delete()->where('course_id', $course_id)->getQuery();
@@ -182,7 +198,7 @@ class CourseController extends Controller {
 
 				// redirecting to all view courses
 				$this->redirect('instructor/viewAllCourse');
-			
+
 			}
 		}
 	}

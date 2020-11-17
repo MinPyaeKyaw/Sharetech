@@ -16,7 +16,7 @@ CRUD for category
 Route::go("insertCatPage","CategoryController@insertPage");
 Route::go("insertCat","CategoryController@insertCategory");
 
-Route::go("fetchCat","CategoryController@fetchCategory");
+// Route::go("fetchCat","CategoryController@fetchCategory");
 
 Route::go("deleteCat","CategoryController@deleteCategory");
 
@@ -46,6 +46,11 @@ CRUD for Video
 Route::go("instructor/editUploadedVideo", "VideoController@insertIndivitualPage");
 Route::go("instructor/finalUpload", "VideoController@insertIndivitualVideo");
 
+Route::go("course/$id", "VideoController@view");
 
+Route::go("instructor/videoUpdate", "VideoController@updateVideo");
+Route::go("instructor/updateDeleteVideos", "VideoController@updateDeleteVideos");
+
+Route::api("api/v1/cat", "CategoryController@fetchCategory");
 
  ?>

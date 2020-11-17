@@ -12,6 +12,7 @@ class VideoController extends Controller {
 				$course_name = $_POST['course_name'];
 				$videos      = $_FILES['video']['name'];
 				$tmp_videos  = $_FILES['video']['tmp_name'];
+				$_SESSION['videosInfo'] = '';
 
 				// initialize input
 				$input = "<input type='hidden' name='courseId' value=".$course_id." />";
@@ -22,6 +23,9 @@ class VideoController extends Controller {
 						// generating input for each video
 						$name = str_replace(' ', '_', basename($videos[$i], '.php'));
 						$input .= $videos[$i]."<br>";
+						// 
+						$video = Security::setFilename($videos[$i]);
+						$input .= "<input type='hidden' name=".$video." value=".$course_name.'/'.$video." />";
 						$input .= "<label>Video Title</label>";
 						$input .= "<br>";
 						$input .= "<input type=\"text\" name=".$name." />";
@@ -30,6 +34,7 @@ class VideoController extends Controller {
 						$input .= "<br>";
 						$input .= "<textarea name="."des_".$name."></textarea>";
 						$input .= "<br>";
+						$input .= "<br>";
 
 						// defining tmp folder path
 						$tmpFolder = "Views/tmp_course/".$course_name."/";
@@ -37,12 +42,14 @@ class VideoController extends Controller {
 						// storing in tmp folder
 						move_uploaded_file(
 							$tmp_videos[$i], 
-							$tmpFolder.$videos[$i]
+							$tmpFolder.$video
 						);
 					}
 				}
-				// exporting data to view
-				$this->view->inputs = $input;
+
+				// assigning inputs into videoInfo session
+				$_SESSION['videosInfo'] = $input;
+
 				$this->view->render('Instructor/insertIndiVideoInfo');
 			}
 		}
@@ -69,17 +76,17 @@ class VideoController extends Controller {
 					array_push($array, $value);
 				}
 
-				for($i=2; $i<count($array); $i++) {
+				for($i=2; $i<count($array); $i+=3) {
 					// getting video info
-					$title = $array[$i];
-					$des = $array[$i+1];
-					$i++;
+					$path = $array[$i];
+					$title = $array[$i+1];
+					$des = $array[$i+2];
 
 					// query for insert video info
 					$sql = $videoModel
 					->insert(
-						'video_title, video_description, course_id',
-						[$title, $des, $course_id]
+						'video_title, video_description, video_path, course_id',
+						[$title, $des, $path, $course_id]
 					)
 					->getQuery();
 					$videoModel->run($sql);
@@ -110,11 +117,153 @@ class VideoController extends Controller {
 						rmdir($tmpFolderPath.$course_name);
 					}
 				}
+
+				// updating course upload status
+				$sql = $videoModel
+				->table('course')
+				->update('uploaded', true)
+				->where('course_id', $course_id)
+				->getQuery();
+				$videoModel->run($sql);
 			}
 		}
 
 		// redirecting to instructor/insertCoursePage
 		$this->redirect('instructor/insertCoursePage');
+	}
+
+	// viewing videos by course
+	public function view($id) {
+		// instance video model
+		$videoModel = new VideoModel();
+
+		// query for fetching videos
+		$sql = $videoModel->select('*')->where('course_id', $id)->getQuery();
+		$data = $videoModel->fetch($sql);
+
+		// exporting data to view
+		$this->view->videos = $data;
+		$this->view->render('Instructor/viewVideo');
+	}
+
+	// updating videos and respective info
+	public function updateVideo() {
+		// instance video model
+		$videoModel = new VideoModel();
+
+		if ((isset($_SESSION['videos']) && isset($_SESSION['course_id'])) || isset($_SESSION['deleted'])) {
+			// query for fetching video info
+				$sql = $videoModel->select('*')->where('course_id', $_SESSION['course_id'])->getQuery();
+				$videos = $videoModel->fetch($sql);
+
+				// exporting data to view
+				$_SESSION['videos'] = $videos;
+				$this->view->render('Instructor/videoUpdatePage');
+		}
+
+		if (isset($_POST['toUpdateVideo'])) {
+			if(Security::verifyCSRF($_POST['csrf']) == true) {
+
+				$course_id = $_POST['course_id'];
+
+				// query for fetching video info
+				$sql = $videoModel->select('*')->where('course_id', $course_id)->getQuery();
+				$videos = $videoModel->fetch($sql);
+
+				// exporting data to view
+				$_SESSION['videos'] = $videos;
+				$_SESSION['course_id'] = $course_id;
+				$this->view->render('Instructor/videoUpdatePage');
+			}
+		}
+	}
+
+	// Updating Individual Videos
+	public function updateDeleteVideos() {
+
+		// instance video model
+		$videoModel = new VideoModel();
+
+		// Deleting Videos
+		if (isset($_POST['deleteVideo'])) {
+			if(Security::verifyCSRF($_POST['csrf']) == true) {
+				$id = $_POST['video_id'];
+				$path = $_POST['path'];
+
+				// query for deleting video
+				$sql = $videoModel
+				->delete()
+				->where('video_id', $id)
+				->getQuery();
+				$videoModel->run($sql);
+
+				// deleting video file
+				$actualPath = "Views/courses/".$path;
+				unlink($actualPath);
+
+				// redirecting to video update page
+				$_SESSION['deleted'] = "deleted";
+				$this->redirect('instructor/videoUpdate');
+
+			}
+		}
+
+		// Updating Videos
+		if (isset($_POST['updateVideo'])) {
+			if(Security::verifyCSRF($_POST['csrf']) == true) {
+				$id = $_POST['video_id'];
+				$title = $_POST['title'];
+				$desc = $_POST['desc'];
+				$path = $_POST['path'];
+				$video = $_FILES['video']['name'];
+				$tmp_video = $_FILES['video']['tmp_name'];
+
+				if (empty($video)) {
+					// query for deleting video
+					$sql = $videoModel
+					->update(
+						'video_title, video_description, video_path',
+						[$title, $desc, $path]
+					)
+					->where('video_id', $id)
+					->getQuery();
+					$videoModel->run($sql);
+				}else {
+					if (Security::escapeFile($video) == true) {
+						$path;
+						$course = explode('/',$path);
+						$course = $course[0];
+						$courseFolder = "Views/courses/".$course;
+						$video = Security::setFilename($video);
+
+						// deleting previous video
+						unlink("Views/courses/".$path);
+
+						// replacing video file
+						move_uploaded_file(
+							$tmp_video, 
+							$courseFolder."/".$video
+						);
+					}
+					$video_path = $course."/".$video;
+
+					// query for deleting video
+					$sql = $videoModel
+					->update(
+						'video_title, video_description, video_path',
+						[$title, $desc, $video_path]
+					)
+					->where('video_id', $id)
+					->getQuery();
+					$videoModel->run($sql);
+				}
+
+				// redirecting to video update page
+				$this->redirect('instructor/videoUpdate');
+
+			}
+		}
+
 	}
 
 }

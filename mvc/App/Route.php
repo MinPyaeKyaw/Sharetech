@@ -77,6 +77,17 @@ class Route {
 		
 	}
 
+	/*-
+	----
+	route function for api
+	*/
+	public static function api($url, $controller) {
+		$inputURL = Security::securingURL(@$_GET['url']);
+		if ($url == $inputURL || empty($inputURL)) {
+			new Bootstrap($url, $controller);
+		}
+	}
+
 } 
 
  ?>

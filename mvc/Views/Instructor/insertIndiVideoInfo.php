@@ -1,10 +1,11 @@
-
-<form method="post" action="<?php Route::route('instructor/finalUpload') ?>">
+<!-- Defining info of each videos -->
+<form method="post" action="<?php Route::route('instructor/finalUpload') ?>" id="videoForm">
 <?php 
 	Security::csrf();
-	echo $this->inputs;
+	echo $_SESSION['videosInfo'];
 ?>
 <br>
-<input type="submit" name="completeUpload" value="Upload" />
-
 </form>
+
+<!-- Button for Uploading video -->
+<input type="submit" name="completeUpload" value="Upload" form="videoForm" />
